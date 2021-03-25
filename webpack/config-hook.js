@@ -106,6 +106,7 @@ module.exports = function (userConfig, MODE, __rootPath) {
               }
             },
             'css-loader',
+            'resolve-url-loader',
             'sass-loader',
             {
               loader: 'sass-resources-loader',

@@ -18,8 +18,5 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "commander": "^7.2.0"
-  },
-  "devDependencies": {
-    "webpack-iconfont-plugin-nodejs": "^1.0.17"
   }
 }

@@ -1,0 +1,17 @@
+const path = require('path')
+const WebpackIconfontPluginNodejs = require('webpack-iconfont-plugin-nodejs')
+
+module.exports = function (__rootPath) {
+  return new WebpackIconfontPluginNodejs({
+    fontName: 'icon-font',
+    cssPrefix: 'icon',
+    template: require.resolve(
+      'comrade-builder/icon-fonts/icon-font-template.njk'
+    ),
+    svgs: path.resolve(__rootPath, 'src/assets/icons/*.svg'),
+    fontsOutput: path.resolve(__rootPath, 'src/assets/fonts/'),
+    cssOutput: path.resolve(__rootPath, 'src/styles/modules/icon-font.css'),
+    htmlOutput: false,
+    formats: ['woff2']
+  })
+}

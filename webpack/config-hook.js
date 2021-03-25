@@ -1,0 +1,174 @@
+const path = require('path')
+const webpack = require('webpack')
+const { merge } = require('webpack-merge')
+
+const createPages = require('./create-pages')
+const createOptimization = require('./create-optimization')
+const createIconFont = require('./create-icon-font')
+
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const WebpackNotifierPlugin = require('webpack-notifier')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const GhostProgressWebpackPlugin = require('ghost-progress-webpack-plugin')
+  .GhostProgressPlugin
+
+module.exports = function (userConfig, MODE, __rootPath) {
+  const iconFontPlugin = createIconFont(__rootPath)
+  const config = {
+    target: MODE === 'development' ? 'web' : 'browserslist',
+    devtool: 'source-map',
+    mode: MODE,
+    stats: {
+      all: false,
+      errors: true,
+      warnings: true,
+      colors: true,
+      entrypoints: true
+    },
+    entry: {
+      core: path.resolve(__rootPath, 'src/application/index.js')
+    },
+
+    output: {
+      path: path.resolve(__rootPath, 'dist'),
+      filename: 'js/[name].js',
+      chunkFilename: 'js/[name].js',
+      clean: true
+    },
+    plugins: [
+      new MiniCssExtractPlugin({
+        filename: 'css/[name].css'
+      }),
+      new WebpackNotifierPlugin({
+        emoji: true,
+        title: path.basename(__rootPath).toUpperCase()
+      }),
+      new GhostProgressWebpackPlugin({
+        format: 'compact'
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: 'src/components/**/images/*.*',
+            to: 'images/[name][ext]',
+            transform: {
+              cache: true
+            }
+          },
+          {
+            from: 'src/assets/images/*.*',
+            to: 'images/[name][ext]',
+            transform: {
+              cache: true
+            }
+          }
+        ]
+      }),
+      ...createPages(MODE, __rootPath),
+      iconFontPlugin,
+      new webpack.DefinePlugin({
+        NODE_ENV: MODE,
+        BUILD_DATE: JSON.stringify(Date.now())
+      })
+    ],
+    optimization: createOptimization(MODE, __rootPath),
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          exclude: /(node_modules)/,
+          use: ['babel-loader', 'eslint-loader']
+        },
+
+        {
+          test: /\.pug$/,
+          use: [
+            {
+              loader: 'pug-loader',
+              options: {
+                root: path.resolve(__rootPath, './src/')
+              }
+            }
+          ]
+        },
+        {
+          test: /\.scss$/i,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+              options: {
+                publicPath: 'dist/'
+              }
+            },
+            'css-loader',
+            'sass-loader',
+            {
+              loader: 'sass-resources-loader',
+              options: {
+                resources: 'src/styles/_resources.scss'
+              }
+            }
+          ]
+        },
+        {
+          test: /\.css$/,
+          use: [MiniCssExtractPlugin.loader, 'css-loader']
+        },
+        {
+          test: /\.(png|svg|jpg|jpeg|gif)$/i,
+          // type: 'asset/resource',
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                limit: 8192,
+                fallback: {
+                  loader: 'file-loader',
+                  options: {
+                    name: '[name].[ext]',
+                    outputPath: 'images/',
+                    publicPath: '../images/'
+                  }
+                }
+              }
+            }
+          ]
+          // generator: {
+          //   filename: 'images/[name][ext]'
+          // }
+        },
+        {
+          test: /\.(woff2)$/i,
+          // type: 'asset/resource',
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '[name].[ext]',
+                outputPath: 'fonts/',
+                publicPath: '../fonts/'
+              }
+            }
+          ]
+          // generator: {
+          //   filename: 'fonts/[name][ext]'
+          // }
+        }
+      ]
+    }
+  }
+  if (MODE === 'production') {
+    config.plugins.push({
+      apply: (compiler) => {
+        compiler.hooks.done.tap('DonePlugin', () => {
+          setTimeout(() => {
+            process.exit(0)
+          })
+        })
+      }
+    })
+  }
+  return merge(config, userConfig, {
+    context: path.resolve(__rootPath)
+  })
+}

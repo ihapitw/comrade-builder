@@ -3,10 +3,11 @@ const path = require('path')
 
 module.exports = {
   async getSourcePath() {
-    const sourcePath = path.resolve(process.env.PWD, 'src')
+    const pwd = process.env.PWD || process.cwd();
+    const sourcePath = path.resolve(pwd, 'src')
     try {
       await fs.access(sourcePath)
-      const package = require(path.resolve(process.env.PWD, 'package.json'))
+      const package = require(path.resolve(pwd, 'package.json'))
       if (package.name === 'comrade-builder') {
         return sourcePath
       } else {

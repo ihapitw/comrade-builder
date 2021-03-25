@@ -1,7 +1,8 @@
 const chalk = require('chalk')
 const packageMeta = require('comrade-builder/package.json')
 const packageVersionText = chalk.magenta.bold(packageMeta.version)
-const packageAuthorText = chalk.magenta.bold(`by ${packageMeta.author}`)
+const authorName = typeof packageMeta.author === 'string' ? packageMeta.author : packageMeta.author.name
+const packageAuthorText = chalk.magenta.bold(`by ${authorName}`)
 
 const beforeRunMessageTemplate = `
                                        __  

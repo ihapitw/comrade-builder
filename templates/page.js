@@ -2,7 +2,7 @@ const fs = require('fs').promises
 const path = require('path')
 const { message, error, warning } = require('../utils/message')
 const pageTemplate = (name) => {
-  return `extends ../pug/layout.pug\n\nblock title\n  | ${name}\nblock page-content\n  | Hello there, in ${name} page!`
+  return `extends ../pug/layout.pug\n\nblock title\n  title ${name}\nblock page-content\n  | Hello there, in ${name} page!`
 }
 
 module.exports = function (name, sourcePath) {

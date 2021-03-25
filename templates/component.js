@@ -21,6 +21,7 @@ module.exports = function (name, sourcePath) {
     })
     .catch(async (err) => {
       await fs.mkdir(target)
+      await fs.mkdir(path.resolve(target, 'images'))
       await Promise.all([
         fs.writeFile(
           path.resolve(target, `${name}.component.pug`),

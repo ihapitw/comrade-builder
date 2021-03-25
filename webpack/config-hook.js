@@ -6,6 +6,8 @@ const createPages = require('./create-pages')
 const createOptimization = require('./create-optimization')
 const createIconFont = require('./create-icon-font')
 
+const { beforeRunMessage } = require('../utils/message')
+
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -13,6 +15,7 @@ const GhostProgressWebpackPlugin = require('ghost-progress-webpack-plugin')
   .GhostProgressPlugin
 
 module.exports = function (userConfig, MODE, __rootPath) {
+  beforeRunMessage()
   const iconFontPlugin = createIconFont(__rootPath)
   const config = {
     target: MODE === 'development' ? 'web' : 'browserslist',
@@ -36,6 +39,7 @@ module.exports = function (userConfig, MODE, __rootPath) {
       clean: true
     },
     plugins: [
+      iconFontPlugin,
       new MiniCssExtractPlugin({
         filename: 'css/[name].css'
       }),
@@ -53,21 +57,22 @@ module.exports = function (userConfig, MODE, __rootPath) {
             to: 'images/[name][ext]',
             transform: {
               cache: true
-            }
+            },
+            noErrorOnMissing: true
           },
           {
             from: 'src/assets/images/*.*',
             to: 'images/[name][ext]',
             transform: {
               cache: true
-            }
+            },
+            noErrorOnMissing: true
           }
         ]
       }),
       ...createPages(MODE, __rootPath),
-      iconFontPlugin,
       new webpack.DefinePlugin({
-        NODE_ENV: MODE,
+        NODE_ENV: JSON.stringify(MODE),
         BUILD_DATE: JSON.stringify(Date.now())
       })
     ],
@@ -116,7 +121,6 @@ module.exports = function (userConfig, MODE, __rootPath) {
         },
         {
           test: /\.(png|svg|jpg|jpeg|gif)$/i,
-          // type: 'asset/resource',
           use: [
             {
               loader: 'url-loader',
@@ -133,13 +137,9 @@ module.exports = function (userConfig, MODE, __rootPath) {
               }
             }
           ]
-          // generator: {
-          //   filename: 'images/[name][ext]'
-          // }
         },
         {
           test: /\.(woff2)$/i,
-          // type: 'asset/resource',
           use: [
             {
               loader: 'file-loader',
@@ -150,9 +150,6 @@ module.exports = function (userConfig, MODE, __rootPath) {
               }
             }
           ]
-          // generator: {
-          //   filename: 'fonts/[name][ext]'
-          // }
         }
       ]
     }

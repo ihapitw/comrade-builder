@@ -1,5 +1,5 @@
 const chalk = require('chalk')
-const packageMeta = require('../package.json')
+const packageMeta = require('comrade-builder/package.json')
 const packageVersionText = chalk.magenta.bold(packageMeta.version)
 const packageAuthorText = chalk.magenta.bold(`by ${packageMeta.author}`)
 

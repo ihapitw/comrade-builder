@@ -34,14 +34,14 @@ module.exports = function (userConfig, MODE, __rootPath) {
 
     output: {
       path: path.resolve(__rootPath, 'dist'),
-      filename: 'js/[name].js',
-      chunkFilename: 'js/[name].js',
+      filename: '[name].js',
+      chunkFilename: '[name].js',
       clean: true
     },
     plugins: [
       iconFontPlugin,
       new MiniCssExtractPlugin({
-        filename: 'css/[name].css'
+        filename: '[name].css'
       }),
       new WebpackNotifierPlugin({
         emoji: true,
@@ -132,7 +132,7 @@ module.exports = function (userConfig, MODE, __rootPath) {
                   options: {
                     name: '[name].[ext]',
                     outputPath: 'images/',
-                    publicPath: '../images/'
+                    publicPath: 'images/'
                   }
                 }
               }
@@ -146,8 +146,8 @@ module.exports = function (userConfig, MODE, __rootPath) {
               loader: 'file-loader',
               options: {
                 name: '[name].[ext]',
-                outputPath: 'fonts/',
-                publicPath: '../fonts/'
+                outputPath: '/',
+                publicPath: '/'
               }
             }
           ]

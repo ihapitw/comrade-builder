@@ -28,6 +28,24 @@ module.exports = function (userConfig, MODE, __rootPath) {
       colors: true,
       entrypoints: true
     },
+    devServer: {
+      before(app, server, compiler) {
+        const watchFiles = ['.pug']
+        compiler.hooks.done.tap('DonePlugin', () => {
+          if (compiler.modifiedFiles) {
+            const changedFiles = Array.from(compiler.modifiedFiles)
+            if (
+              this.hot &&
+              changedFiles.some((filePath) =>
+                watchFiles.includes(path.parse(filePath).ext)
+              )
+            ) {
+              server.sockWrite(server.sockets, 'content-changed')
+            }
+          }
+        })
+      }
+    },
     entry: {
       core: path.resolve(__rootPath, 'src/application/index.js')
     },
@@ -146,7 +164,7 @@ module.exports = function (userConfig, MODE, __rootPath) {
               loader: 'file-loader',
               options: {
                 name: '[name].[ext]',
-                outputPath: '/',
+                outputPath: '',
                 publicPath: '/'
               }
             }

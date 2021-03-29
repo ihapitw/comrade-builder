@@ -2,5 +2,5 @@ extends ../pug/layout.pug
 
 block title
   title {{name}}
-  block page-content
-    | Hello there, in {{name}} page!
+block page-content
+  | Hello there, in {{name}} page!
